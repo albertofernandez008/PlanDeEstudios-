@@ -1,4 +1,4 @@
-# Organización de Parciales — versión personal v14
+# Organización de Parciales — versión personal v16
 
 Aplicación local de planificación y estudio. Abre `index.html` en un navegador moderno.
 
@@ -19,6 +19,18 @@ Aplicación local de planificación y estudio. Abre `index.html` en un navegador
 - Nuevo modo de tutor socrático.
 - Dificultad configurable (básica, media, alta o universitaria) para tests y preguntas de examen.
 
+
+## Novedades v16
+- Rediseño profundo del panel «Hoy» como centro de estudio: prioridades accionables, resumen diario/semanal, próximos exámenes, ritmo de estudio, carga estimada y estado de cada asignatura.
+- La cola de prioridades permite abrir Focus con asignatura y tema seleccionados.
+- Cada examen muestra temas pendientes y un indicador orientativo de preparación. El indicador combina temario completado (45%), dominio declarado (35%) y evaluaciones recientes (20%); si no hay evaluaciones, normaliza los pesos disponibles. No predice la nota del examen.
+- La carga pendiente suma los minutos estimados de los temas no completados. El ritmo semanal usa sesiones registradas de los últimos siete días.
+- Se mantienen las herramientas, el plan diario anterior y el almacenamiento local existentes.
+
+## Límites v16
+- El indicador de preparación es una heurística descriptiva, no una predicción académica validada. El dominio es autodeclarado y la calidad depende de los datos registrados.
+- Las horas pendientes son la suma de estimaciones que hayas asignado a los temas; no equivalen necesariamente al tiempo real que necesitarás.
+- La actividad y el progreso reflejan sesiones y evaluaciones registradas en este navegador.
 
 ## Novedades v15
 - El inicio «Hoy» incorpora un centro de mando que combina el temario personal, repasos vencidos, flashcards pendientes, historial de evaluaciones y sesiones Focus.

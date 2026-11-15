@@ -19,7 +19,7 @@ function load() {
   vm.runInContext(code + `
     renderApp = () => {}; showToast = () => {};
     globalThis.__t = { moveDebtToNextTask, undoMove, getTarget, getTaskData, findTaskById, sanitizeState,
-      logSession, studyStats, loadState, saveState, generatePlan, validatePlanConfig, cleanCurriculum, curriculumToPlanSubjects, nextReviewDate, buildReviewQueue, cleanStudySessions, cleanStudyGoals, cleanFlashcards, flashcardNextDue, getDueFlashcards, rateFlashcard, parseGeneratedFlashcards, parseFlashcardCSV, cleanStudyDocuments, documentContextText, buildDocumentTutorTask, buildRecallGradingPrompt, parseRecallGrading, rankWeakTopics, buildWeeklyStudyPlan, moveWeeklyPlanItem, cleanAssessmentHistory, addAssessmentRecord, topicAssessmentSummary, cleanWeeklyAvailability, buildAcademicTrend, cleanTutorChat, getTutorChat, appendTutorChat, buildStudyDashboardModel };`, ctx);
+      logSession, studyStats, loadState, saveState, generatePlan, validatePlanConfig, cleanCurriculum, curriculumToPlanSubjects, nextReviewDate, buildReviewQueue, cleanStudySessions, cleanStudyGoals, cleanFlashcards, flashcardNextDue, getDueFlashcards, rateFlashcard, parseGeneratedFlashcards, parseFlashcardCSV, cleanStudyDocuments, documentContextText, buildDocumentTutorTask, buildRecallGradingPrompt, parseRecallGrading, rankWeakTopics, buildWeeklyStudyPlan, moveWeeklyPlanItem, cleanAssessmentHistory, addAssessmentRecord, topicAssessmentSummary, cleanWeeklyAvailability, buildAcademicTrend, cleanTutorChat, getTutorChat, appendTutorChat, buildStudyDashboardModel, subjectReadiness };`, ctx);
   return { t: ctx.__t, store };
 }
 
@@ -522,5 +522,58 @@ test("el panel no inventa medias ni exámenes cuando no hay datos", () => {
   assert.equal(model.gradeAverage, null);
   assert.equal(model.nextExam, null);
   assert.equal(model.pendingTopics, 0);
-  assert.equal(model.recommendation.kind, "subjects");
+  assert.equal(model.recommendation.kind, "setup");
+});
+
+
+test("el dashboard calcula preparación orientativa con componentes disponibles", () => {
+  const { t } = load();
+  const subject = { id:"s", name:"Física", topics:[
+    {id:"a",name:"Tema A",done:true,mastery:4},
+    {id:"b",name:"Tema B",done:false,mastery:2}
+  ]};
+  const readiness = t.subjectReadiness(subject, [
+    {date:"2026-11-14",subjectId:"s",topicId:"a",score:8,source:"ai"}
+  ], "2026-11-15");
+  assert.equal(readiness.completion, 50);
+  assert.equal(readiness.mastery, 60);
+  assert.equal(readiness.gradeCount, 1);
+  assert.equal(readiness.gradeAverage, 8);
+  assert.ok(readiness.score >= 0 && readiness.score <= 100);
+});
+
+test("el dashboard agrega consistencia y carga estimada de la semana", () => {
+  const { t } = load();
+  const model = t.buildStudyDashboardModel([
+    {id:"s",name:"Química",topics:[{id:"a",name:"Enlace",done:false,mastery:2,minutes:90}]}
+  ], [], [
+    {date:"2026-11-15",minutes:45,subjectId:"s"},
+    {date:"2026-11-13",minutes:30,subjectId:"s"}
+  ], [], "2026-11-15");
+  assert.equal(model.weekMinutes, 75);
+  assert.equal(model.studyDays, 2);
+  assert.equal(model.estimatedOpenMinutes, 90);
+  assert.equal(model.daily.length, 7);
+  assert.equal(model.subjectOverview[0].minutes, 75);
+});
+
+test("el estado por asignatura distingue ausencia de datos de preparación cero", () => {
+  const { t } = load();
+  const noTopics = t.subjectReadiness({id:"s",topics:[]}, [], "2026-11-15");
+  assert.equal(noTopics.score, null);
+  assert.equal(noTopics.label, "Sin temario");
+});
+
+test("los próximos exámenes incorporan carga pendiente y nivel orientativo", () => {
+  const { t } = load();
+  const model = t.buildStudyDashboardModel([
+    {id:"s",name:"Historia",exam:"2026-11-18",topics:[
+      {id:"a",name:"Tema 1",done:true,mastery:4,minutes:60},
+      {id:"b",name:"Tema 2",done:false,mastery:2,minutes:90}
+    ]}
+  ], [], [], [], "2026-11-15");
+  assert.equal(model.nextExam.days, 3);
+  assert.equal(model.nextExam.pending, 1);
+  assert.equal(model.nextExam.total, 2);
+  assert.ok(model.nextExam.readiness.score !== null);
 });
