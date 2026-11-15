@@ -67,6 +67,243 @@
     .ai-msg code { font-family: monospace; background: rgba(99, 102, 241, 0.12); padding: 1px 4px; border-radius: 4px; }
     .ai-msg pre code { background: transparent; padding: 0; }
   </style>
+<style id="study-v17-design-system">
+/* Organización de Parciales v17 — sistema visual propio, sin utilidades dinámicas externas */
+:root {
+  --sv-bg: #f4f6fb; --sv-surface: #ffffff; --sv-surface-soft: #f8f9fc;
+  --sv-text: #172033; --sv-muted: #667085; --sv-subtle: #8b95a7;
+  --sv-border: #e6eaf1; --sv-accent: #5b5ce2; --sv-accent-soft: #eeefff;
+  --sv-shadow: 0 8px 28px rgba(15, 23, 42, .045);
+  --sv-radius: 18px;
+}
+html.dark {
+  --sv-bg: #0b1220; --sv-surface: #111b2b; --sv-surface-soft: #152135;
+  --sv-text: #edf2fa; --sv-muted: #a0aec0; --sv-subtle: #7f8da3;
+  --sv-border: #26344a; --sv-accent: #8987ff; --sv-accent-soft: #25264e;
+  --sv-shadow: 0 12px 34px rgba(0, 0, 0, .16);
+}
+html { scroll-behavior: smooth; }
+body { background: var(--sv-bg) !important; color: var(--sv-text); }
+button, input, select, textarea { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgba(129, 140, 248, .75) !important; outline-offset: 2px; }
+
+/* Navegación compacta: una sola banda desplazable, sin salto visual entre filas */
+#app-navigation { display: flex; flex-direction: row; align-items: center; gap: 14px; padding: 10px 0 13px; border-color: var(--sv-border) !important; }
+#view-mode-buttons { display: flex; flex: 1 1 auto; min-width: 0; flex-wrap: nowrap !important; align-items: center; gap: 6px !important; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 5px; scrollbar-width: thin; scrollbar-color: rgba(128, 139, 160, .35) transparent; }
+#view-mode-buttons::-webkit-scrollbar { height: 4px; }
+#view-mode-buttons::-webkit-scrollbar-thumb { background: rgba(128,139,160,.32); border-radius: 99px; }
+#view-mode-buttons .view-btn { flex: 0 0 auto; min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 12px !important; border: 1px solid transparent !important; border-radius: 11px !important; background: transparent !important; color: var(--sv-muted) !important; box-shadow: none !important; font-size: 12px !important; font-weight: 650 !important; line-height: 1.2; white-space: nowrap; transition: background .16s ease, color .16s ease, border-color .16s ease; }
+#view-mode-buttons .view-btn:hover { background: var(--sv-surface-soft) !important; color: var(--sv-text) !important; }
+#view-mode-buttons .view-btn.bg-indigo-600 { background: var(--sv-accent-soft) !important; border-color: transparent !important; color: var(--sv-accent) !important; box-shadow: inset 0 0 0 1px rgba(99,102,241,.10) !important; }
+#view-mode-buttons .view-btn i { width: 15px; height: 15px; opacity: .86; }
+#view-mode-buttons #pending-badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; margin-left: 1px; padding: 0 5px; border-radius: 99px; background: #fef0c7 !important; color: #92400e !important; font-size: 10px; }
+#app-navigation > div:last-child { flex: 0 0 auto; display: flex; align-items: center; gap: 7px; }
+#app-navigation > div:last-child label { color: var(--sv-subtle) !important; font-size: 11px !important; }
+#app-navigation #filter-subject { min-height: 36px; border: 1px solid var(--sv-border) !important; border-radius: 10px !important; background: var(--sv-surface) !important; color: var(--sv-text) !important; padding: 7px 10px !important; font-size: 11px !important; }
+
+/* Encabezado superior y contenido general */
+body > header { background: color-mix(in srgb, var(--sv-surface) 91%, transparent) !important; border-color: var(--sv-border) !important; box-shadow: 0 1px 0 rgba(15,23,42,.025); }
+body > header > div { min-height: 62px; }
+main { max-width: 1440px !important; padding-top: 22px !important; padding-bottom: 52px !important; }
+
+/* Panel principal v17 */
+.study-v17 { display: flex; flex-direction: column; gap: 18px; color: var(--sv-text); }
+.sv-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; padding: 2px 2px 1px; }
+.sv-eyebrow, .sv-section-kicker, .sv-hero-kicker, .sv-time-label { margin: 0; font-size: 9px; line-height: 1.35; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+.sv-eyebrow { display: flex; align-items: center; gap: 8px; color: var(--sv-subtle); }
+.sv-live-dot { width: 7px; height: 7px; border-radius: 99px; background: #28c88b; box-shadow: 0 0 0 3px rgba(40,200,139,.12); }
+.sv-heading-separator { color: var(--sv-border); }
+.sv-heading h1 { margin: 8px 0 0; color: var(--sv-text); font-size: clamp(25px, 3vw, 34px); font-weight: 820; line-height: 1.1; letter-spacing: -.045em; }
+.sv-subtitle { margin: 7px 0 0; color: var(--sv-muted); font-size: 13px; line-height: 1.55; }
+.sv-quiet-link { border: 0; padding: 6px 0; background: transparent; color: var(--sv-accent); font-size: 11px; font-weight: 750; white-space: nowrap; cursor: pointer; }
+.sv-quiet-link:hover { color: #7775f3; }
+.sv-hero { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(250px, .65fr); align-items: center; gap: 24px; overflow: hidden; min-height: 195px; padding: clamp(22px, 3vw, 32px); border: 1px solid rgba(156, 163, 255, .13); border-radius: 22px; background: linear-gradient(112deg, #151d36 0%, #202653 60%, #29245f 100%); color: #f7f8ff; box-shadow: 0 16px 40px rgba(19, 24, 65, .14); }
+.sv-hero-main, .sv-hero-time { position: relative; z-index: 2; }
+.sv-hero-kicker { color: #a8a8ff; }
+.sv-hero h2 { max-width: 680px; margin: 10px 0 0; color: #fff; font-size: clamp(22px, 2.7vw, 31px); font-weight: 820; line-height: 1.14; letter-spacing: -.035em; }
+.sv-hero-main > p { max-width: 610px; margin: 9px 0 0; color: #c1c8de; font-size: 12px; line-height: 1.6; }
+.sv-hero-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 19px; }
+.sv-primary-action, .sv-secondary-action { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 9px 13px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; transition: transform .16s ease, background .16s ease; }
+.sv-primary-action { border: 1px solid #fff; background: #fff; color: #1a2140; }
+.sv-primary-action:hover { transform: translateY(-1px); background: #eeefff; }
+.sv-secondary-action { border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.07); color: #f5f6ff; }
+.sv-secondary-action:hover { background: rgba(255,255,255,.14); }
+.sv-hero-time { display: grid; grid-template-columns: 1fr; gap: 13px; padding: 18px 19px; border: 1px solid rgba(255,255,255,.14); border-radius: 15px; background: rgba(255,255,255,.065); backdrop-filter: blur(8px); }
+.sv-hero-time > div:not(.sv-time-divider) { display: flex; flex-direction: column; align-items: flex-start; }
+.sv-time-label { color: #b7bee0; font-size: 8px; }
+.sv-hero-time strong { display: block; margin-top: 4px; color: #fff; font-size: 25px; font-weight: 820; line-height: 1.1; letter-spacing: -.035em; }
+.sv-hero-time small { margin-top: 4px; color: #aeb8d2; font-size: 10px; }
+.sv-time-divider { height: 1px; background: rgba(255,255,255,.12); }
+.sv-hero-orb { position: absolute; z-index: 1; pointer-events: none; border-radius: 50%; filter: blur(1px); }
+.sv-hero-orb-one { width: 270px; height: 270px; top: -175px; right: 18%; background: rgba(124, 116, 255, .17); }
+.sv-hero-orb-two { width: 190px; height: 190px; bottom: -150px; right: 4%; background: rgba(105, 95, 237, .16); }
+
+.sv-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: hidden; border: 1px solid var(--sv-border); border-radius: 15px; background: var(--sv-surface); box-shadow: var(--sv-shadow); }
+.sv-metric { min-width: 0; display: flex; align-items: center; gap: 12px; padding: 15px 18px; }
+.sv-metric + .sv-metric { border-left: 1px solid var(--sv-border); }
+.sv-metric-icon { width: 34px; height: 34px; flex: 0 0 34px; display: grid; place-items: center; border-radius: 11px; background: var(--sv-accent-soft); color: var(--sv-accent); font-size: 17px; font-weight: 750; }
+.sv-metric-data { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.sv-metric-data b { color: var(--sv-text); font-size: 21px; font-weight: 820; line-height: 1; letter-spacing: -.035em; }
+.sv-metric-data small { color: var(--sv-muted); font-size: 10px; line-height: 1.35; }
+
+.sv-main-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .85fr); gap: 15px; align-items: stretch; }
+.sv-secondary-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr); gap: 15px; }
+.sv-panel { min-width: 0; border: 1px solid var(--sv-border); border-radius: var(--sv-radius); background: var(--sv-surface); box-shadow: var(--sv-shadow); }
+.sv-priorities-panel, .sv-exams-panel, .sv-activity-panel, .sv-workload-panel { padding: 19px 20px; }
+.sv-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sv-section-kicker { display: block; color: var(--sv-subtle); font-size: 8px; }
+.sv-panel-heading h3 { margin: 5px 0 0; color: var(--sv-text); font-size: 16px; font-weight: 800; letter-spacing: -.025em; line-height: 1.25; }
+.sv-count-pill { flex: 0 0 auto; padding: 5px 8px; border-radius: 99px; background: var(--sv-surface-soft); color: var(--sv-muted); font-size: 9px; font-weight: 750; }
+.sv-priority-list { margin-top: 12px; }
+.sv-priority-row { width: 100%; min-width: 0; display: flex; align-items: center; gap: 11px; padding: 11px 5px; border: 0; border-top: 1px solid var(--sv-border); background: transparent; text-align: left; cursor: pointer; }
+.sv-priority-row:hover { background: var(--sv-surface-soft); }
+.sv-priority-index { width: 26px; height: 26px; flex: 0 0 26px; display: grid; place-items: center; border-radius: 9px; background: var(--sv-surface-soft); color: var(--sv-muted); font-size: 10px; font-weight: 800; }
+.sv-priority-index.is-first { background: #fff0ec; color: #d6533a; }
+.sv-priority-copy { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; }
+.sv-priority-copy b, .sv-exam-copy b { overflow: hidden; color: var(--sv-text); font-size: 11px; font-weight: 760; text-overflow: ellipsis; white-space: nowrap; }
+.sv-priority-copy small, .sv-exam-copy small { overflow: hidden; color: var(--sv-muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.sv-row-action { flex: 0 0 auto; color: var(--sv-accent); font-size: 9px; font-weight: 800; }
+.sv-panel-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 11px; margin-top: 2px; border-top: 1px solid var(--sv-border); }
+.sv-panel-footer span { color: var(--sv-subtle); font-size: 9px; }
+.sv-panel-footer button, .sv-chart-caption button { padding: 4px 0; border: 0; background: transparent; color: var(--sv-accent); font-size: 10px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.sv-icon-link { width: 29px; height: 29px; display: grid; place-items: center; border: 1px solid var(--sv-border); border-radius: 9px; background: var(--sv-surface-soft); color: var(--sv-accent); font-size: 15px; cursor: pointer; }
+.sv-exams-list { display: flex; flex-direction: column; margin-top: 12px; }
+.sv-exam-row { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--sv-border); }
+.sv-exam-date { width: 58px; flex: 0 0 58px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; padding-left: 9px; border-left: 2px solid #8584ee; }
+.sv-exam-date.is-soon { border-color: #e36b59; }
+.sv-exam-date b { color: var(--sv-accent); font-size: 9px; font-weight: 850; }
+.sv-exam-date.is-soon b { color: #e36b59; }
+.sv-exam-date small { color: var(--sv-subtle); font-size: 9px; }
+.sv-exam-copy { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; }
+.sv-progress-track { width: 100%; height: 5px; overflow: hidden; margin-top: 4px; border-radius: 99px; background: var(--sv-surface-soft); }
+.sv-progress-track i { display: block; height: 100%; border-radius: inherit; background: var(--sv-accent); }
+.sv-progress-track i.is-good { background: #28a879; }
+.sv-progress-track i.is-mid { background: #d99a37; }
+.sv-progress-track i.is-low { background: #df695d; }
+.sv-progress-track i.is-neutral { background: #929bad; }
+.sv-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 20px 5px; }
+.sv-empty b { color: var(--sv-text); font-size: 11px; }
+.sv-empty span { max-width: 430px; color: var(--sv-muted); font-size: 10px; line-height: 1.6; }
+.sv-empty button { margin-top: 5px; padding: 0; border: 0; background: transparent; color: var(--sv-accent); font-size: 10px; font-weight: 800; cursor: pointer; }
+
+.sv-panel-meta { color: var(--sv-muted); font-size: 9px; }
+.sv-week-chart { height: 122px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); align-items: end; gap: clamp(8px, 2vw, 19px); padding: 15px 4px 0; }
+.sv-day { height: 100%; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; }
+.sv-day-value { height: 12px; color: var(--sv-subtle); font-size: 8px; white-space: nowrap; }
+.sv-day-bar { width: min(100%, 34px); height: 78px; display: flex; align-items: end; overflow: hidden; border-radius: 7px 7px 3px 3px; background: var(--sv-surface-soft); }
+.sv-day-bar i { width: 100%; display: block; min-height: 2px; border-radius: 6px 6px 2px 2px; background: #a9abef; }
+.sv-day.is-today .sv-day-bar i { background: #6968e7; }
+.sv-day-label { color: var(--sv-subtle); font-size: 9px; font-weight: 650; text-transform: capitalize; }
+.sv-day.is-today .sv-day-label { color: var(--sv-accent); font-weight: 850; }
+.sv-chart-caption { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; margin-top: 5px; border-top: 1px solid var(--sv-border); color: var(--sv-muted); font-size: 9px; }
+.sv-workload-mark { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: var(--sv-accent-soft); color: var(--sv-accent); font-size: 17px; }
+.sv-workload-number { margin-top: 20px; color: var(--sv-text); font-size: 34px; font-weight: 850; line-height: 1; letter-spacing: -.045em; }
+.sv-workload-number span { margin-left: 5px; color: var(--sv-muted); font-size: 12px; font-weight: 650; letter-spacing: 0; }
+.sv-workload-description { max-width: 370px; margin: 8px 0 15px; color: var(--sv-muted); font-size: 10px; line-height: 1.55; }
+.sv-workload-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 12px; border-top: 1px solid var(--sv-border); }
+.sv-workload-split span { display: flex; flex-direction: column; gap: 4px; }
+.sv-workload-split b { color: var(--sv-text); font-size: 15px; font-weight: 820; }
+.sv-workload-split small { color: var(--sv-muted); font-size: 9px; }
+.sv-subjects-section { padding: 2px 1px 0; }
+.sv-subject-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 22px; margin-top: 10px; border-top: 1px solid var(--sv-border); }
+.sv-subject-row { width: 100%; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 13px 5px; border: 0; border-bottom: 1px solid var(--sv-border); background: transparent; text-align: left; cursor: pointer; }
+.sv-subject-row:hover { background: var(--sv-surface-soft); }
+.sv-subject-dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; }
+.sv-subject-name { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; }
+.sv-subject-name b { overflow: hidden; color: var(--sv-text); font-size: 10px; font-weight: 760; text-overflow: ellipsis; white-space: nowrap; }
+.sv-subject-name small { overflow: hidden; color: var(--sv-muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.sv-subject-progress { width: 80px; flex: 0 0 80px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.sv-subject-progress b { color: var(--sv-text); font-size: 10px; }
+.sv-subject-progress i { width: 100%; height: 4px; overflow: hidden; border-radius: 99px; background: var(--sv-surface-soft); }
+.sv-subject-progress em { display: block; height: 100%; border-radius: inherit; }
+.sv-empty-inline { grid-column: 1 / -1; padding: 18px 5px; }
+.sv-footnote { margin: 9px 0 0; color: var(--sv-subtle); font-size: 9px; line-height: 1.55; }
+.sv-shortcuts { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; padding-top: 12px; border-top: 1px solid var(--sv-border); }
+.sv-shortcuts > span { margin-right: 4px; color: var(--sv-subtle); font-size: 8px; font-weight: 850; letter-spacing: .14em; }
+.sv-shortcuts button { min-height: 30px; padding: 6px 10px; border: 1px solid var(--sv-border); border-radius: 9px; background: var(--sv-surface); color: var(--sv-muted); font-size: 9px; font-weight: 700; cursor: pointer; }
+.sv-shortcuts button:hover { border-color: var(--sv-accent); color: var(--sv-accent); }
+
+/* Sistema compartido para el resto de pantallas: asignaturas, biblioteca, repasos, Focus y progreso */
+#view-phases-container > div,
+#view-exams-container #exams-items-list > div,
+#view-subjects-container > div:first-child,
+#view-subjects-container #subjects-list > article,
+#view-library-container article,
+#view-flashcards-container > article:not([class*="bg-indigo-50"]),
+#view-focus-container > div:first-child,
+#view-progress-container article,
+#view-review-container #review-list > article {
+  border-color: var(--sv-border) !important;
+  border-radius: var(--sv-radius) !important;
+  box-shadow: var(--sv-shadow) !important;
+}
+#view-phases-container > div,
+#view-exams-container #exams-items-list > div,
+#view-subjects-container > div:first-child,
+#view-subjects-container #subjects-list > article,
+#view-library-container article,
+#view-flashcards-container > article:not([class*="bg-indigo-50"]),
+#view-focus-container > div:first-child,
+#view-progress-container article,
+#view-review-container #review-list > article {
+  background: var(--sv-surface) !important;
+  color: var(--sv-text);
+}
+#view-phases-container > div > div.p-5 > div { border-color: var(--sv-border) !important; border-radius: 13px !important; background: var(--sv-surface-soft) !important; }
+#view-subjects-container #subjects-list > article > div .rounded-xl { border-color: var(--sv-border); }
+#view-review-container #review-list > article { padding: 17px !important; }
+main input:not([type="file"]):not([type="color"]), main select, main textarea {
+  min-height: 37px; border-color: var(--sv-border) !important; border-radius: 10px !important;
+  background-color: var(--sv-surface-soft) !important; color: var(--sv-text) !important;
+}
+main input[type="checkbox"] { accent-color: #6968e7; }
+main input::placeholder, main textarea::placeholder { color: var(--sv-subtle); }
+main button.bg-indigo-600 { border-radius: 10px; box-shadow: 0 3px 10px rgba(79,70,229,.13); }
+main button.border { border-color: var(--sv-border) !important; border-radius: 10px; }
+input, select, textarea { border-radius: 10px; }
+button:not(.view-btn):not(.sv-primary-action):not(.sv-secondary-action):not(.sv-priority-row):not(.sv-subject-row):not(.sv-shortcuts button) { transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease; }
+@media (max-width: 1050px) {
+  #app-navigation { flex-direction: column; align-items: stretch; gap: 8px; }
+  #app-navigation > div:last-child { align-self: flex-end; }
+  .sv-main-grid { grid-template-columns: minmax(0, 1.25fr) minmax(260px, .85fr); }
+}
+@media (max-width: 760px) {
+  main { padding-left: 14px !important; padding-right: 14px !important; padding-top: 16px !important; }
+  .study-v17 { gap: 13px; }
+  .sv-heading { align-items: flex-start; }
+  .sv-heading .sv-quiet-link { margin-top: 18px; font-size: 10px; }
+  .sv-hero { grid-template-columns: 1fr; gap: 18px; padding: 21px; }
+  .sv-hero-time { grid-template-columns: 1fr 1px 1fr; gap: 12px; padding: 13px; }
+  .sv-time-divider { width: 1px; height: auto; }
+  .sv-hero-time strong { font-size: 20px; }
+  .sv-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sv-metric { padding: 12px; }
+  .sv-metric:nth-child(3) { border-left: 0; border-top: 1px solid var(--sv-border); }
+  .sv-metric:nth-child(4) { border-top: 1px solid var(--sv-border); }
+  .sv-main-grid, .sv-secondary-grid { grid-template-columns: 1fr; gap: 12px; }
+  .sv-subject-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 460px) {
+  #view-mode-buttons .view-btn { min-height: 36px; padding: 7px 10px !important; font-size: 11px !important; }
+  .sv-heading { display: block; }
+  .sv-heading .sv-quiet-link { display: inline-block; margin-top: 10px; }
+  .sv-heading h1 { font-size: 26px; }
+  .sv-hero h2 { font-size: 23px; }
+  .sv-hero-time { gap: 8px; }
+  .sv-hero-time strong { font-size: 18px; }
+  .sv-metric-icon { width: 30px; height: 30px; flex-basis: 30px; }
+  .sv-metric-data b { font-size: 18px; }
+  .sv-priorities-panel, .sv-exams-panel, .sv-activity-panel, .sv-workload-panel { padding: 16px 15px; }
+  .sv-panel-footer { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .sv-subject-progress { width: 64px; flex-basis: 64px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+</style>
+
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col transition-colors duration-200">
 
@@ -269,7 +506,7 @@
     </div>
 
     <!-- TABS AND FILTERS BAR -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+    <div id="app-navigation" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4" aria-label="Navegación principal">
       
       <!-- View Modes -->
       <div class="flex flex-wrap items-center gap-2" id="view-mode-buttons">
@@ -2214,37 +2451,112 @@ ${JSON.stringify(safe)}`;
     }
     function renderStudyDashboard() {
       const m = buildStudyDashboardModel(curriculum, assessmentHistory, focusSessions, flashcards);
-      const host = document.getElementById("study-dashboard"); if (!host) return;
-      const mins = n => n<60?`${n} min`:`${Math.floor(n/60)} h ${n%60?`${n%60} min`:''}`;
-      const r=m.recommendation, action=r.kind==="topic"?`data-dashboard-focus="${esc(r.subjectId)}|${esc(r.topicId)}"`:`data-dashboard-nav="${r.kind}"`;
-      const dateLabel=new Date(m.today+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});
-      const readinessColor=n=>n===null?"bg-slate-300":n>=80?"bg-emerald-500":n>=60?"bg-amber-500":"bg-rose-500";
-      const weekMax=Math.max(60,...m.daily.map(x=>x.minutes));
-      host.innerHTML=`
-      <div class="space-y-5">
-        <section class="relative overflow-hidden rounded-[1.75rem] bg-[#10172e] text-white p-5 sm:p-7 shadow-xl">
-          <div class="absolute -right-16 -top-24 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl"></div><div class="absolute right-1/4 -bottom-32 w-64 h-64 rounded-full bg-violet-500/10 blur-3xl"></div>
-          <div class="relative flex flex-col xl:flex-row xl:items-end xl:justify-between gap-6">
-            <div class="max-w-2xl"><div class="flex items-center gap-2 text-[10px] uppercase tracking-[.2em] font-bold text-indigo-300"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Tu espacio de estudio · ${dateLabel}</div><h2 class="text-3xl sm:text-4xl font-black tracking-tight mt-3">Estudia con dirección.</h2><p class="text-sm text-slate-300 mt-2 max-w-xl">Tu progreso, tus prioridades y tus próximos exámenes, conectados en un solo lugar.</p><div class="flex flex-wrap gap-2 mt-5"><button ${action} class="rounded-xl bg-white text-slate-950 px-4 py-2.5 text-xs font-extrabold hover:bg-indigo-100 transition">${r.kind==="topic"?"Empezar tema recomendado":r.kind==="review"?"Abrir repasos":r.kind==="flashcards"?"Repasar tarjetas":"Preparar mi estudio"} <span class="ml-1">→</span></button><button data-dashboard-nav="focus" class="rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-xs font-bold hover:bg-white/10">Iniciar Focus</button></div></div>
-            <div class="grid grid-cols-2 gap-2 sm:min-w-[330px]"><div class="rounded-2xl border border-white/10 bg-white/[.07] p-4"><p class="text-[10px] uppercase tracking-wider text-slate-300">Hoy</p><p class="text-3xl font-black mt-1">${mins(m.todayMinutes)}</p><p class="text-[10px] text-slate-400 mt-1">Tiempo registrado</p></div><div class="rounded-2xl border border-white/10 bg-white/[.07] p-4"><p class="text-[10px] uppercase tracking-wider text-slate-300">Últimos 7 días</p><p class="text-3xl font-black mt-1">${mins(m.weekMinutes)}</p><p class="text-[10px] text-slate-400 mt-1">${m.studyDays}/7 días con estudio</p></div></div>
+      const host = document.getElementById("study-dashboard");
+      if (!host) return;
+      const mins = n => n < 60 ? `${n} min` : `${Math.floor(n / 60)} h${n % 60 ? ` ${n % 60} min` : ""}`;
+      const r = m.recommendation;
+      const action = r.kind === "topic"
+        ? `data-dashboard-focus="${esc(r.subjectId)}|${esc(r.topicId)}"`
+        : `data-dashboard-nav="${esc(r.kind)}"`;
+      const dateLabel = new Date(m.today + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
+      const weekMax = Math.max(60, ...m.daily.map(x => x.minutes));
+      const readinessColor = n => n === null ? "is-neutral" : n >= 80 ? "is-good" : n >= 60 ? "is-mid" : "is-low";
+      const primaryLabel = r.kind === "topic" ? "Empezar tema" : r.kind === "review" ? "Abrir repasos" : r.kind === "flashcards" ? "Repasar tarjetas" : r.kind === "setup" ? "Configurar asignaturas" : "Ver siguiente paso";
+      const metricItems = [
+        [m.pendingTopics, "Temas pendientes", "book"],
+        [m.reviewCount, "Repasos vencidos", "repeat"],
+        [m.dueCards, "Flashcards pendientes", "layers"],
+        [m.gradeAverage === null ? "—" : `${m.gradeAverage}/10`, "Media de evaluaciones", "chart"]
+      ];
+      const priorityHtml = m.ranked.length
+        ? m.ranked.slice(0, 4).map((t, i) => `
+            <button data-dashboard-focus="${esc(t.subjectId)}|${esc(t.topicId)}" class="sv-priority-row" type="button">
+              <span class="sv-priority-index ${i === 0 ? "is-first" : ""}">${i + 1}</span>
+              <span class="sv-priority-copy"><b>${esc(t.topic)}</b><small>${esc(t.subject)} · Dominio ${t.mastery}/5${t.assessmentAvg === null ? "" : ` · Evaluación ${t.assessmentAvg}/10`}</small></span>
+              <span class="sv-row-action">Estudiar <span aria-hidden="true">→</span></span>
+            </button>`).join("")
+        : `<div class="sv-empty"><b>Tu lista está despejada</b><span>No hay temas que necesiten refuerzo ahora. Puedes avanzar con el siguiente tema o practicar con flashcards.</span></div>`;
+      const examsHtml = m.exams.length
+        ? m.exams.slice(0, 3).map(e => `
+            <article class="sv-exam-row">
+              <span class="sv-exam-date ${e.days <= 3 ? "is-soon" : ""}"><b>${e.days === 0 ? "HOY" : e.days === 1 ? "MAÑANA" : `${e.days} DÍAS`}</b><small>${new Date(e.date + "T12:00:00").toLocaleDateString("es-ES", { day: "numeric", month: "short" })}</small></span>
+              <span class="sv-exam-copy"><b>${esc(e.subject)}</b><small>${e.pending}/${e.total} temas pendientes · ${esc(e.pressure)}</small><span class="sv-progress-track"><i class="${readinessColor(e.readiness.score)}" style="width:${e.readiness.score ?? 0}%"></i></span></span>
+            </article>`).join("")
+        : `<div class="sv-empty"><b>Sin exámenes programados</b><span>Añade una fecha de examen en tus asignaturas para ver aquí la cuenta atrás y el estado del temario.</span><button type="button" data-dashboard-nav="subjects">Ir a mis asignaturas →</button></div>`;
+      const dailyHtml = m.daily.map(x => {
+        const height = x.minutes ? Math.max(7, Math.round(x.minutes / weekMax * 100)) : 3;
+        const day = new Date(x.date + "T12:00:00").toLocaleDateString("es-ES", { weekday: "short" }).replace(".", "");
+        return `<div class="sv-day ${x.today ? "is-today" : ""}" title="${esc(day)}: ${mins(x.minutes)}"><span class="sv-day-value">${x.minutes ? mins(x.minutes) : ""}</span><span class="sv-day-bar"><i style="height:${height}%"></i></span><span class="sv-day-label">${esc(day.slice(0, 2))}</span></div>`;
+      }).join("");
+      const subjectsHtml = m.subjectOverview.length
+        ? m.subjectOverview.map(s => `
+            <button type="button" data-dashboard-nav="subjects" class="sv-subject-row">
+              <span class="sv-subject-dot" style="background:${esc(s.color)}"></span>
+              <span class="sv-subject-name"><b>${esc(s.name)}</b><small>${s.done}/${s.total} temas · ${esc(s.readiness.label)}</small></span>
+              <span class="sv-subject-progress"><b>${s.pct}%</b><i><em style="width:${s.pct}%;background:${esc(s.color)}"></em></i></span>
+            </button>`).join("")
+        : `<div class="sv-empty sv-empty-inline"><b>Empieza por tus asignaturas</b><span>Al añadir materias y temas aparecerán aquí el avance y las prioridades.</span><button type="button" data-dashboard-nav="subjects">Crear asignatura →</button></div>`;
+      const totalWorkHours = Math.round(m.estimatedOpenMinutes / 60 * 10) / 10;
+      host.innerHTML = `
+        <div class="study-v17">
+          <div class="sv-heading">
+            <div><p class="sv-eyebrow"><span class="sv-live-dot"></span> TU ESPACIO DE ESTUDIO <span class="sv-heading-separator">/</span> ${esc(dateLabel)}</p><h1>Estudia con dirección.</h1><p class="sv-subtitle">Una vista clara de lo importante para que sepas dónde poner tu atención.</p></div>
+            <button type="button" class="sv-quiet-link" data-dashboard-nav="progress">Ver mi progreso <span aria-hidden="true">↗</span></button>
           </div>
-          <div class="relative grid grid-cols-2 sm:grid-cols-4 gap-2 mt-6">${[[m.pendingTopics,"Temas pendientes","book-open"],[m.reviewCount,"Repasos vencidos","brain"],[m.dueCards,"Tarjetas pendientes","layers"],[m.gradeAverage===null?"—":m.gradeAverage+"/10","Media registrada","chart-no-axes-combined"]].map(([v,l])=>`<div class="rounded-xl border border-white/10 bg-white/[.06] p-3"><p class="text-2xl font-black">${v}</p><p class="text-[10px] text-slate-300 mt-1">${l}</p></div>`).join("")}</div>
-        </section>
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <section class="xl:col-span-2 rounded-2xl border border-indigo-200 dark:border-indigo-900 bg-white dark:bg-slate-900 p-5 shadow-sm">
-            <div class="flex items-start justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.16em] font-extrabold text-indigo-600 dark:text-indigo-300">Tu siguiente mejor paso</p><h3 class="text-xl font-black text-slate-900 dark:text-white mt-1">${esc(r.title)}</h3><p class="text-sm text-slate-500 dark:text-slate-400 mt-2">${esc(r.detail)}</p></div><div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white grid place-items-center text-xl shrink-0">✦</div></div>
-            ${m.ranked.length?`<div class="mt-5 border-t border-slate-100 dark:border-slate-800 pt-4"><div class="flex justify-between items-center mb-3"><p class="text-[10px] uppercase tracking-wider font-extrabold text-slate-500">Cola de prioridades</p><span class="text-[10px] text-slate-400">Ordenada por necesidad de refuerzo</span></div><div class="space-y-2">${m.ranked.slice(0,4).map((t,i)=>`<button data-dashboard-focus="${esc(t.subjectId)}|${esc(t.topicId)}" class="w-full text-left flex items-center gap-3 rounded-xl p-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition"><span class="w-7 h-7 rounded-lg ${i===0?"bg-rose-100 text-rose-700":"bg-slate-100 dark:bg-slate-800 text-slate-500"} grid place-items-center text-xs font-black">${i+1}</span><span class="flex-1 min-w-0"><b class="block text-xs text-slate-800 dark:text-slate-100 truncate">${esc(t.topic)}</b><span class="block text-[10px] text-slate-500 truncate">${esc(t.subject)} · Dominio ${t.mastery}/5${t.assessmentAvg===null?"":` · ${t.assessmentAvg}/10`}</span></span><span class="text-[10px] font-bold text-indigo-600">Estudiar →</span></button>`).join("")}</div></div>`:`<div class="mt-5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 p-3 text-xs text-emerald-800 dark:text-emerald-300">No hay temas pendientes que priorizar. Puedes consolidar con flashcards o simulacros.</div>`}
+
+          <section class="sv-hero" aria-label="Siguiente paso recomendado">
+            <div class="sv-hero-main">
+              <span class="sv-hero-kicker">TU SIGUIENTE MEJOR PASO</span>
+              <h2>${esc(r.title)}</h2>
+              <p>${esc(r.detail)}</p>
+              <div class="sv-hero-actions"><button type="button" ${action} class="sv-primary-action">${primaryLabel}<span aria-hidden="true">→</span></button><button type="button" data-dashboard-nav="focus" class="sv-secondary-action"><span aria-hidden="true">◷</span> Iniciar Focus</button></div>
+            </div>
+            <div class="sv-hero-time">
+              <div><span class="sv-time-label">ESTUDIADO HOY</span><strong>${mins(m.todayMinutes)}</strong><small>Tiempo registrado en sesiones</small></div>
+              <div class="sv-time-divider"></div>
+              <div><span class="sv-time-label">ÚLTIMOS 7 DÍAS</span><strong>${mins(m.weekMinutes)}</strong><small>${m.studyDays} de 7 días con actividad</small></div>
+            </div>
+            <span class="sv-hero-orb sv-hero-orb-one" aria-hidden="true"></span><span class="sv-hero-orb sv-hero-orb-two" aria-hidden="true"></span>
           </section>
-          <section class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm"><div class="flex items-center justify-between"><div><p class="text-[10px] uppercase tracking-wider font-extrabold text-slate-400">Calendario cercano</p><h3 class="font-black text-slate-900 dark:text-white mt-1">Próximos exámenes</h3></div><span class="text-xl">◷</span></div>${m.exams.length?`<div class="mt-4 space-y-4">${m.exams.map(e=>`<div class="border-l-[3px] ${e.days<=3?"border-rose-500":"border-indigo-400"} pl-3"><div class="flex justify-between gap-2"><b class="text-xs text-slate-800 dark:text-slate-100">${esc(e.subject)}</b><span class="text-[10px] font-extrabold ${e.days<=3?"text-rose-600":"text-indigo-600 dark:text-indigo-300"}">${e.days===0?"Hoy":e.days===1?"Mañana":`${e.days} días`}</span></div><p class="text-[10px] text-slate-500 mt-1">${new Date(e.date+"T12:00:00").toLocaleDateString("es-ES",{day:"numeric",month:"long"})} · ${e.pending}/${e.total} temas pendientes</p><div class="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 mt-2 overflow-hidden"><div class="h-full ${readinessColor(e.readiness.score)}" style="width:${e.readiness.score??0}%"></div></div><div class="flex justify-between mt-1"><span class="text-[9px] text-slate-400">Avance orientativo: ${e.readiness.score===null?"sin datos":e.readiness.score+"%"}</span><span class="text-[9px] font-bold ${e.pressure==="Urgente"||e.pressure==="Alta"?"text-rose-600":"text-slate-400"}">${e.pressure}</span></div></div>`).join("")}</div>`:`<div class="mt-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-4 text-center"><p class="text-xs font-bold text-slate-600 dark:text-slate-300">Sin exámenes próximos</p><p class="text-[10px] text-slate-400 mt-1">Añade fechas en tus asignaturas para activar el seguimiento.</p></div>`}<button data-dashboard-nav="subjects" class="mt-4 text-xs font-bold text-indigo-600 dark:text-indigo-300">Gestionar asignaturas →</button></section>
-        </div>
-        <div class="grid grid-cols-1 xl:grid-cols-5 gap-4">
-          <section class="xl:col-span-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5"><div class="flex items-center justify-between gap-3"><div><p class="text-[10px] uppercase tracking-wider font-extrabold text-slate-400">Constancia</p><h3 class="font-black text-slate-900 dark:text-white mt-1">Tu ritmo de estudio</h3></div><span class="text-xs text-slate-500">Últimos 7 días</span></div><div class="grid grid-cols-7 gap-2 items-end h-32 mt-5">${m.daily.map(x=>`<div class="h-full flex flex-col justify-end items-center gap-2"><div class="w-full max-w-10 rounded-t-lg ${x.today?"bg-indigo-600":"bg-indigo-300 dark:bg-indigo-900"}" style="height:${Math.max(x.minutes?5:2,Math.round(x.minutes/weekMax*100))}%" title="${mins(x.minutes)}"></div><span class="text-[9px] ${x.today?"font-black text-indigo-600":"text-slate-400"}">${new Date(x.date+"T12:00:00").toLocaleDateString("es-ES",{weekday:"narrow"})}</span></div>`).join("")}</div><div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-100 dark:border-slate-800"><span class="text-[10px] text-slate-500">${m.studyDays} días activos · ${mins(m.weekMinutes)} acumulados</span><button data-dashboard-nav="progress" class="text-[10px] font-bold text-indigo-600">Ver analítica →</button></div></section>
-          <section class="xl:col-span-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5"><p class="text-[10px] uppercase tracking-wider font-extrabold text-slate-400">Carga pendiente</p><h3 class="font-black text-slate-900 dark:text-white mt-1">Lo que queda por delante</h3><p class="text-3xl font-black text-slate-900 dark:text-white mt-4">${Math.round(m.estimatedOpenMinutes/60*10)/10} <span class="text-sm font-bold text-slate-400">horas estimadas</span></p><p class="text-[10px] text-slate-500 mt-1">Suma de los minutos estimados en los temas no completados.</p><div class="grid grid-cols-2 gap-2 mt-4"><div class="rounded-xl bg-slate-50 dark:bg-slate-800 p-3"><p class="text-xl font-black">${m.completedTopics}/${m.totalTopics}</p><p class="text-[10px] text-slate-500">Temas completados</p></div><div class="rounded-xl bg-slate-50 dark:bg-slate-800 p-3"><p class="text-xl font-black">${m.assessmentCount}</p><p class="text-[10px] text-slate-500">Evaluaciones</p></div></div></section>
-        </div>
-        <section class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5"><div class="flex flex-wrap items-end justify-between gap-2"><div><p class="text-[10px] uppercase tracking-wider font-extrabold text-slate-400">Vista por asignatura</p><h3 class="font-black text-slate-900 dark:text-white mt-1">Estado de tu temario</h3></div><span class="text-[10px] text-slate-400">El indicador no predice la nota del examen</span></div>${m.subjectOverview.length?`<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-4">${m.subjectOverview.map(s=>`<article class="rounded-xl border border-slate-200 dark:border-slate-700 p-3.5"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${esc(s.color)}"></span><b class="text-xs text-slate-800 dark:text-slate-100 flex-1 truncate">${esc(s.name)}</b>${s.exam?`<span class="text-[9px] text-slate-500">${s.exam.days===0?"Hoy":`${s.exam.days} d`}</span>`:""}</div><div class="flex items-end justify-between mt-4"><span class="text-2xl font-black text-slate-900 dark:text-white">${s.pct}%</span><span class="text-[10px] text-slate-500">${s.done}/${s.total} temas</span></div><div class="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mt-2"><div class="h-full" style="width:${s.pct}%;background:${esc(s.color)}"></div></div><div class="flex justify-between items-center mt-3"><span class="text-[10px] ${s.readiness.score!==null&&s.readiness.score<50?"text-rose-600":"text-slate-500"}">${s.readiness.label}</span><span class="text-[10px] text-slate-400">${mins(s.minutes)} esta semana</span></div></article>`).join("")}</div>`:`<div class="mt-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center"><p class="text-sm font-bold text-slate-700 dark:text-slate-200">Tu panel está listo para empezar</p><p class="text-xs text-slate-500 mt-1">Crea asignaturas y añade temas para desbloquear prioridades, carga y seguimiento.</p><button data-dashboard-nav="subjects" class="mt-3 text-xs font-bold text-indigo-600">Crear primera asignatura →</button></div>`}</section>
-        <section class="grid grid-cols-1 sm:grid-cols-3 gap-3"><button data-dashboard-nav="focus" class="text-left rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 hover:border-indigo-400 transition"><span class="text-xl">◉</span><b class="block text-sm mt-2">Sesión Focus</b><span class="text-[11px] text-slate-500">Concéntrate y registra el trabajo.</span></button><button data-dashboard-nav="library" class="text-left rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 hover:border-indigo-400 transition"><span class="text-xl">▤</span><b class="block text-sm mt-2">Biblioteca IA</b><span class="text-[11px] text-slate-500">Estudia directamente desde tus apuntes.</span></button><button data-dashboard-nav="flashcards" class="text-left rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 hover:border-indigo-400 transition"><span class="text-xl">▧</span><b class="block text-sm mt-2">Recuerdo activo</b><span class="text-[11px] text-slate-500">Practica y consolida lo aprendido.</span></button></section>
-        <p class="text-[10px] text-slate-400 px-1">Criterio de preparación: combinación orientativa de temario completado, dominio declarado y, cuando existen, evaluaciones recientes. No es una predicción de calificación.</p>
-      </div>`;
+
+          <section class="sv-metrics" aria-label="Resumen académico">
+            ${metricItems.map(([value, label, icon], i) => `<div class="sv-metric"><span class="sv-metric-icon sv-icon-${icon}" aria-hidden="true">${["▤", "↻", "▱", "⌁"][i]}</span><span class="sv-metric-data"><b>${value}</b><small>${label}</small></span></div>`).join("")}
+          </section>
+
+          <div class="sv-main-grid">
+            <section class="sv-panel sv-priorities-panel">
+              <div class="sv-panel-heading"><div><span class="sv-section-kicker">EN QUÉ CENTRARTE</span><h3>Prioridades de estudio</h3></div><span class="sv-count-pill">${m.ranked.length} temas</span></div>
+              <div class="sv-priority-list">${priorityHtml}</div>
+              <div class="sv-panel-footer"><span>Ordenadas según repaso, dominio y evaluaciones recientes.</span><button type="button" data-dashboard-nav="subjects">Ver temario completo →</button></div>
+            </section>
+            <section class="sv-panel sv-exams-panel">
+              <div class="sv-panel-heading"><div><span class="sv-section-kicker">FECHAS IMPORTANTES</span><h3>Próximos exámenes</h3></div><button class="sv-icon-link" type="button" data-dashboard-nav="exams" aria-label="Ver todos los exámenes">↗</button></div>
+              <div class="sv-exams-list">${examsHtml}</div>
+            </section>
+          </div>
+
+          <div class="sv-secondary-grid">
+            <section class="sv-panel sv-activity-panel">
+              <div class="sv-panel-heading"><div><span class="sv-section-kicker">CONSTANCIA</span><h3>Tu ritmo esta semana</h3></div><span class="sv-panel-meta">${m.studyDays} días activos</span></div>
+              <div class="sv-week-chart" role="img" aria-label="Minutos de estudio registrados durante los últimos siete días">${dailyHtml}</div>
+              <div class="sv-chart-caption"><span>${mins(m.weekMinutes)} acumulados</span><button type="button" data-dashboard-nav="progress">Abrir analítica →</button></div>
+            </section>
+            <section class="sv-panel sv-workload-panel">
+              <div class="sv-panel-heading"><div><span class="sv-section-kicker">VISIÓN GENERAL</span><h3>Carga pendiente</h3></div><span class="sv-workload-mark" aria-hidden="true">◷</span></div>
+              <div class="sv-workload-number">${totalWorkHours}<span>h estimadas</span></div>
+              <p class="sv-workload-description">Tiempo estimado para completar los temas que aún tienes pendientes.</p>
+              <div class="sv-workload-split"><span><b>${m.completedTopics}/${m.totalTopics}</b><small>Temas completados</small></span><span><b>${m.assessmentCount}</b><small>Evaluaciones registradas</small></span></div>
+            </section>
+          </div>
+
+          <section class="sv-subjects-section">
+            <div class="sv-panel-heading"><div><span class="sv-section-kicker">VISTA POR ASIGNATURA</span><h3>Estado de tu temario</h3></div><button type="button" class="sv-quiet-link" data-dashboard-nav="subjects">Gestionar asignaturas ↗</button></div>
+            <div class="sv-subject-list">${subjectsHtml}</div>
+            <p class="sv-footnote">El indicador de preparación es orientativo. Combina temario completado, dominio declarado y evaluaciones disponibles; no predice la nota del examen.</p>
+          </section>
+
+          <nav class="sv-shortcuts" aria-label="Accesos rápidos"><span>IR A</span><button type="button" data-dashboard-nav="focus">◷ Focus</button><button type="button" data-dashboard-nav="library">▤ Biblioteca IA</button><button type="button" data-dashboard-nav="flashcards">▱ Flashcards</button><button type="button" data-dashboard-nav="review">↻ Repaso espaciado</button></nav>
+        </div>`;
     }
 
     function renderTodayView() {

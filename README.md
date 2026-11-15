@@ -68,3 +68,20 @@ Aplicación local de planificación y estudio. Abre `index.html` en un navegador
 
 ## Pruebas
 46 pruebas automáticas cubren la lógica de planificación, disponibilidad, conversaciones, evolución académica y el modelo agregado del nuevo panel de estudio. Ejecuta `node --test logic.test.mjs` desde esta carpeta.
+
+
+## Versión 17 — remodelación visual integral
+
+- Rediseño del panel Hoy con un sistema de estilos semántico propio, jerarquía tipográfica, métricas compactas y módulos de prioridades, exámenes, actividad semanal, carga y asignaturas.
+- Navegación compacta de una sola banda desplazable, con estado activo claro y filtro de asignatura alineado.
+- Estilos responsive para escritorio, tableta y móvil; foco visible por teclado y respeto a `prefers-reduced-motion`.
+- Se mantienen las funciones, IDs de vistas, lógica de estudio, datos y claves de almacenamiento existentes.
+- No se modifican Supabase ni las integraciones.
+
+### Verificación de v17
+
+- 50 pruebas de lógica existentes y 6 pruebas estáticas de interfaz: **56/56 superadas**.
+- Sintaxis de los cuatro bloques JavaScript inline comprobada con Node.js.
+- Tres bloques CSS comprobados con un parser CSS; sin errores de sintaxis.
+- `config.js`, `supabase.sql` y `logic.test.mjs` se mantienen byte a byte iguales a v16.
+- La prueba visual en Chromium no pudo completarse en este entorno; no se declara validación visual real en navegador.
