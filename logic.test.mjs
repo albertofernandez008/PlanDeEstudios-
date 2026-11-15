@@ -19,7 +19,7 @@ function load() {
   vm.runInContext(code + `
     renderApp = () => {}; showToast = () => {};
     globalThis.__t = { moveDebtToNextTask, undoMove, getTarget, getTaskData, findTaskById, sanitizeState,
-      logSession, studyStats, loadState, saveState, generatePlan, validatePlanConfig, cleanCurriculum, curriculumToPlanSubjects, nextReviewDate, buildReviewQueue, cleanStudySessions, cleanStudyGoals, cleanFlashcards, flashcardNextDue, getDueFlashcards, rateFlashcard, parseGeneratedFlashcards, parseFlashcardCSV, cleanStudyDocuments, documentContextText, buildDocumentTutorTask, buildRecallGradingPrompt, parseRecallGrading, rankWeakTopics, buildWeeklyStudyPlan, moveWeeklyPlanItem };`, ctx);
+      logSession, studyStats, loadState, saveState, generatePlan, validatePlanConfig, cleanCurriculum, curriculumToPlanSubjects, nextReviewDate, buildReviewQueue, cleanStudySessions, cleanStudyGoals, cleanFlashcards, flashcardNextDue, getDueFlashcards, rateFlashcard, parseGeneratedFlashcards, parseFlashcardCSV, cleanStudyDocuments, documentContextText, buildDocumentTutorTask, buildRecallGradingPrompt, parseRecallGrading, rankWeakTopics, buildWeeklyStudyPlan, moveWeeklyPlanItem, cleanAssessmentHistory, addAssessmentRecord, topicAssessmentSummary, cleanWeeklyAvailability, buildAcademicTrend, cleanTutorChat, getTutorChat, appendTutorChat, buildStudyDashboardModel };`, ctx);
   return { t: ctx.__t, store };
 }
 
@@ -361,4 +361,166 @@ test("el modo socrático guía con una pregunta sin revelar la solución", () =>
   const prompt=t.buildDocumentTutorTask("socratic","derivadas");
   assert.match(prompt,/UNA pregunta cada vez/);
   assert.match(prompt,/exclusivamente el documento/);
+});
+
+test("el historial de evaluaciones limpia, limita y conserva la procedencia", () => {
+  const { t } = load();
+  const history = t.cleanAssessmentHistory([
+    { id: "a", date: "2026-11-15", subjectId: "s", topicId: "t", score: 8.26, source: "ai", verdict: "correcta", feedback: "Bien" },
+    { date: "fecha-mala", subjectId: "s", topicId: "t", score: 7 },
+    { date: "2026-11-15", subjectId: "s", topicId: "t", score: 99, source: "otra" }
+  ]);
+  assert.equal(history.length, 2);
+  assert.equal(history[0].score, 8.3);
+  assert.equal(history[0].source, "ai");
+  assert.equal(history[1].score, 10);
+  assert.equal(history[1].source, "self");
+});
+
+test("las evaluaciones recientes se resumen por tema y alimentan la prioridad", () => {
+  const { t } = load();
+  const subjects = [{ id: "s", name: "Física", topics: [
+    { id: "a", name: "Tema A", done: false, mastery: 3, nextReview: "2026-11-16" },
+    { id: "b", name: "Tema B", done: false, mastery: 3, nextReview: "2026-11-16" }
+  ] }];
+  const history = [
+    { date: "2026-11-14", subjectId: "s", topicId: "a", subject: "Física", topic: "Tema A", score: 2, source: "ai" },
+    { date: "2026-11-15", subjectId: "s", topicId: "a", subject: "Física", topic: "Tema A", score: 3, source: "self" },
+    { date: "2026-11-15", subjectId: "s", topicId: "b", subject: "Física", topic: "Tema B", score: 9, source: "ai" }
+  ];
+  const summary = t.topicAssessmentSummary(history, "s", "a");
+  assert.equal(summary.average, 2.5);
+  assert.equal(summary.count, 2);
+  assert.equal(summary.last, "2026-11-15");
+  const ranked = t.rankWeakTopics(subjects, "2026-11-15", history);
+  assert.equal(ranked[0].topicId, "a");
+  assert.equal(ranked[0].assessmentAvg, 2.5);
+});
+
+test("el plan semanal amplía el tiempo de temas con resultados bajos", () => {
+  const { t } = load();
+  const subjects = [{ id: "s", name: "Química", topics: [
+    { id: "a", name: "Enlaces", done: false, mastery: 3, nextReview: "2026-11-16" }
+  ] }];
+  const baseline = t.buildWeeklyStudyPlan(subjects, "2026-11-16", 120, []);
+  const assessed = t.buildWeeklyStudyPlan(subjects, "2026-11-16", 120, [
+    { date: "2026-11-15", subjectId: "s", topicId: "a", subject: "Química", topic: "Enlaces", score: 3, source: "ai" }
+  ]);
+  assert.equal(assessed[0].items[0].minutes, baseline[0].items[0].minutes + 15);
+  assert.equal(assessed[0].items[0].assessmentAvg, 3);
+});
+
+test("addAssessmentRecord añade una evaluación sin mutar el historial original", () => {
+  const { t } = load();
+  const original = [];
+  const next = t.addAssessmentRecord(original, { subjectId: "s", subject: "Mates", topicId: "t", topic: "Derivadas" }, 7.5, "ai", "2026-11-15", { verdict: "parcial" });
+  assert.equal(original.length, 0);
+  assert.equal(next.length, 1);
+  assert.equal(next[0].score, 7.5);
+  assert.equal(next[0].source, "ai");
+});
+
+test("las sesiones Focus quedan vinculadas al tema y se conservan al limpiar", () => {
+  const { t } = load();
+  const sessions = t.cleanStudySessions([{ id: "f1", date: "2026-11-15", minutes: 45, subjectId: "s", topicId: "t", note: "Derivadas", source: "focus" }]);
+  assert.equal(sessions[0].topicId, "t");
+  assert.equal(sessions[0].note, "Derivadas");
+});
+
+test("la actividad Focus reciente reduce la prioridad de un tema ya practicado", () => {
+  const { t } = load();
+  const subjects = [{ id: "s", name: "Mates", topics: [
+    { id: "a", name: "Integrales", done: false, mastery: 3, nextReview: "2026-11-20" },
+    { id: "b", name: "Derivadas", done: false, mastery: 3, nextReview: "2026-11-20" }
+  ] }];
+  const sessions = [{ id: "f", date: "2026-11-15", minutes: 60, subjectId: "s", topicId: "a", source: "focus" }];
+  const ranked = t.rankWeakTopics(subjects, "2026-11-15", [], sessions);
+  assert.equal(ranked[0].topicId, "b");
+  assert.equal(ranked.find(x => x.topicId === "a").recentStudyMinutes, 60);
+});
+
+
+test("la disponibilidad semanal limita minutos y normaliza duración de sesión", () => {
+  const { t } = load();
+  const cfg = t.cleanWeeklyAvailability({ days: [-10, 60, 9999, "x"], sessionMinutes: 500 });
+  assert.deepEqual(JSON.parse(JSON.stringify(cfg)), { days: [0, 60, 720, 120, 120, 120, 120], sessionMinutes: 180 });
+});
+
+test("el plan semanal respeta la disponibilidad del día y duración máxima", () => {
+  const { t } = load();
+  const subjects = [{ id: "s", name: "Física", topics: Array.from({ length: 5 }, (_, i) => ({ id: `t${i}`, name: `Tema ${i}`, done: false, mastery: 1, minutes: 120, nextReview: "2026-11-16" })) }];
+  const plan = t.buildWeeklyStudyPlan(subjects, "2026-11-16", 120, [], [], { days: [60, 0, 0, 0, 0, 0, 0], sessionMinutes: 45 });
+  assert.equal(plan[0].items.reduce((n, x) => n + x.minutes, 0), 45);
+  assert.ok(plan.slice(1).every(day => day.items.length === 0));
+  assert.ok(plan.every(day => day.items.every(item => item.minutes <= 45)));
+});
+
+test("el planificador reparte temas en los días que tienen disponibilidad", () => {
+  const { t } = load();
+  const subjects = [{ id: "s", name: "Mates", topics: Array.from({ length: 4 }, (_, i) => ({ id: `t${i}`, name: `Tema ${i}`, done: false, mastery: 2, minutes: 60, nextReview: "2026-11-16" })) }];
+  const plan = t.buildWeeklyStudyPlan(subjects, "2026-11-16", 120, [], [], { days: [50, 0, 50, 0, 50, 0, 0], sessionMinutes: 50 });
+  assert.ok(plan[0].items.length + plan[2].items.length + plan[4].items.length > 0);
+  assert.equal(plan[1].items.length + plan[3].items.length + plan[5].items.length + plan[6].items.length, 0);
+});
+
+test("el historial del tutor conserva turnos válidos y limita su tamaño", () => {
+  const { t } = load();
+  const rows = Array.from({ length: 30 }, (_, i) => ({ role: i % 2 ? "model" : "user", text: `Mensaje ${i}`, at: "2026-11-15" }));
+  const clean = t.cleanTutorChat([...rows, { role: "system", text: "No guardar" }, { role: "user", text: "  " }]);
+  assert.equal(clean.length, 24);
+  assert.equal(clean[0].text, "Mensaje 6");
+  assert.equal(clean.at(-1).text, "Mensaje 29");
+});
+
+test("appendTutorChat no muta el historial previo y mantiene chats separados por documento", () => {
+  const { t } = load();
+  const original = { docA: [{ role: "user", text: "Hola" }] };
+  const next = t.appendTutorChat(original, "docA", "model", "Respuesta");
+  const other = t.appendTutorChat(next, "docB", "user", "Otra duda");
+  assert.equal(original.docA.length, 1);
+  assert.equal(t.getTutorChat("docA", other).length, 2);
+  assert.equal(t.getTutorChat("docB", other)[0].text, "Otra duda");
+});
+
+test("la evolución académica agrupa horas y notas por semana", () => {
+  const { t } = load();
+  const trend = t.buildAcademicTrend([
+    { date: "2026-11-09", subjectId: "s", topicId: "t", score: 8, source: "ai" },
+    { date: "2026-11-10", subjectId: "s", topicId: "t", score: 6, source: "self" }
+  ], [{ date: "2026-11-09", minutes: 90 }, { date: "2026-11-12", minutes: 30 }], "2026-11-15");
+  assert.equal(trend.length, 6);
+  const week = trend.find(x => x.start === "2026-11-09");
+  assert.equal(week.minutes, 120);
+  assert.equal(week.assessments, 2);
+  assert.equal(week.average, 7);
+});
+
+test("el panel de estudio integra horas, repasos, flashcards, notas y próximos exámenes", () => {
+  const { t } = load();
+  const today = "2026-11-15";
+  const subjects = [{ id:"s1", name:"Matemáticas", exam:"2026-11-20", topics:[
+    { id:"t1", name:"Matrices", mastery:2, done:false, nextReview:"2026-11-14", minutes:60 },
+    { id:"t2", name:"Vectores", mastery:4, done:true, nextReview:"2026-11-30", minutes:45 }
+  ] }];
+  const sessions = [{ id:"f1", date:today, minutes:50, subjectId:"s1", topicId:"t1", source:"focus" }];
+  const history = [{ id:"a1", date:today, subjectId:"s1", topicId:"t1", score:6, source:"ai" }];
+  const cards = [{ id:"c1", front:"Pregunta", back:"Respuesta", due:today }];
+  const model = t.buildStudyDashboardModel(subjects, history, sessions, cards, today);
+  assert.equal(model.todayMinutes, 50);
+  assert.equal(model.pendingTopics, 1);
+  assert.equal(model.completedTopics, 1);
+  assert.equal(model.reviewCount, 1);
+  assert.equal(model.dueCards, 1);
+  assert.equal(model.gradeAverage, 6);
+  assert.equal(model.nextExam.days, 5);
+  assert.equal(model.recommendation.kind, "review");
+});
+
+test("el panel no inventa medias ni exámenes cuando no hay datos", () => {
+  const { t } = load();
+  const model = t.buildStudyDashboardModel([], [], [], [], "2026-11-15");
+  assert.equal(model.gradeAverage, null);
+  assert.equal(model.nextExam, null);
+  assert.equal(model.pendingTopics, 0);
+  assert.equal(model.recommendation.kind, "subjects");
 });
